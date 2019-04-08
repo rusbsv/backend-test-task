@@ -1,0 +1,25 @@
+# web-interface for all of this manipulation with books and authors
+GET     /                           controllers.HomeController.index
+
+# Map static resources from the /public folder to the /assets URL path
+GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)
+
+# get all books (with his authors)
+GET     /books                    controllers.HomeController.getAllBooks
+
+# get all authors
+# GET     /authors                  controllers.HomeController.getAllAuthors
+
+# get one book by id
+
+
+# get one author by id
+
+
+# add book, JSON format: { title: "Дэвид Копперфильд", year: 1850, authors: ["Чарльз Диккенс"]}
+POST    /books                    controllers.HomeController.addBook
+
+# update book
+
+
+# delete book by id
