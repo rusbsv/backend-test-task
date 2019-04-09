@@ -37,7 +37,9 @@ book_id int auto_increment not null primary key,
 
 title varchar(120) not null,
 
-year int);
+year int
+
+);
 
 
 create table authors (
