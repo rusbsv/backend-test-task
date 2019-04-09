@@ -1,7 +1,7 @@
 package controllers
 
 import models._
-import services.BookService
+import services.LibraryService
 import javax.inject._
 import play.api.mvc._
 
@@ -10,18 +10,36 @@ import play.api.libs.json._
 
 @Singleton
 class HomeController @Inject()(
-  bookService: BookService
+  libraryService: LibraryService
 )(implicit ec: ExecutionContext) extends InjectedController {
 
   def index() = Action { implicit request: Request[AnyContent] =>
-    Ok(views.html.index())
+    Ok(templates.html.index())
+  }
+
+  def getBooksList() = Action.async {
+    libraryService.getBooksList.map {
+      seqOfClassBook =>
+        Ok(Json.toJson(seqOfClassBook))
+    }.recover { case _ =>
+      BadRequest(Json.toJson("status" -> "error", "message" -> "DB Error"))
+    }
+  }
+
+  def getAuthorsList() = Action.async {
+    libraryService.getAuthorsList.map {
+      seqOfClassAuthor =>
+        Ok(Json.toJson(seqOfClassAuthor))
+    }.recover { case _ =>
+        BadRequest(Json.toJson("status" -> "error", "message" -> "DB Error"))
+    }
   }
 
   def addBook() = Action(parse.json).async { request =>
-    request.body.validate[BookAndAuthors].fold(
+    request.body.validate[BookYearAuthors].fold(
       errors => Future.successful(BadRequest(Json.obj("status" -> "Error", "message" -> JsError.toJson(errors)))),
       { bookJSON =>
-        bookService.addBook(bookJSON).map { newId =>
+        libraryService.addBook(bookJSON).map { newId =>
           Ok(Json.obj("message" -> ("Book save with id '" + newId)))
         }.recover { case _ =>
           BadRequest(Json.toJson("status" -> "error", "message" -> "DB Error"))
@@ -30,11 +48,11 @@ class HomeController @Inject()(
     )
   }
 
-  def getAllBooks() = Action.async {
-    bookService.getAllBooks.map { seqOfClassBook =>
-      Ok(Json.toJson(seqOfClassBook))
-    }.recover { case _ =>
-      BadRequest(Json.toJson("status" -> "error", "message" -> "DB Error"))
+
+
+  def deleteBook(bookId: Int) = Action.async {
+    libraryService.deleteBook(bookId).map {
+      countDel => Ok(Json.obj("message" -> (countDel + " book deleted")))
     }
   }
 

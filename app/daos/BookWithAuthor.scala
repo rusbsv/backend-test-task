@@ -1,5 +1,0 @@
-package daos
-
-class BookWithAuthor {
-
-}

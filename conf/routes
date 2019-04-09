@@ -4,22 +4,21 @@ GET     /                           controllers.HomeController.index
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)
 
-# get all books (with his authors)
-GET     /books                    controllers.HomeController.getAllBooks
+# get books in format: {title, year, authors[]}
+# GET     /library                      controller.HomeController.getAllBookYearAuthors
+# GET     /library/:bookId              controller.HomeController.getBookYearAuthorsById(bookId: Int)
 
-# get all authors
-# GET     /authors                  controllers.HomeController.getAllAuthors
+# get books titles in format: {book_id, title}
+GET     /library/titles               controllers.HomeController.getBooksList
 
-# get one book by id
+# get authors in format: {author_id, author_name}
+GET     /library/authors              controllers.HomeController.getAuthorsList
 
+# add new book
+POST    /library                      controllers.HomeController.addBook
 
-# get one author by id
+# update book by bookId
+# PUT     /library/:bookId              controllers.HomeController.updateBook(bookId: Int)
 
-
-# add book, JSON format: { title: "Дэвид Копперфильд", year: 1850, authors: ["Чарльз Диккенс"]}
-POST    /books                    controllers.HomeController.addBook
-
-# update book
-
-
-# delete book by id
+# delete book by bookId
+DELETE  /library/:bookId              controllers.HomeController.deleteBook(bookId: Int)
