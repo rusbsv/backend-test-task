@@ -25,26 +25,42 @@ Framework – Play
 База – MySql или любая другая СУБД
 
 
-### Описание таблиц
 
-Три таблицы: книги, авторы, книги-авторы (для связи многие-ко-многим)
+# Описание таблиц
+
+####Три таблицы: книги, авторы, книги-авторы (для связи многие-ко-многим)
 
 
 create table books (
+
 book_id int auto_increment not null primary key, 
+
 title varchar(120) not null,
+
 year int);
 
+
 create table authors (
+
 author_id int auto_increment not null primary key,
+
 author_name varchar(120) not null
+
 );
 
+
 create table books_by_authors (
+
 book_id int not null,
+
 author_id int not null,
+
 constraint books_fk
+
 foreign key (book_id) references books (book_id) on delete cascade on update cascade,
+
 constraint authors_fk
+
 foreign key (book_id) references authors (author_id) on delete cascade on update cascade
+
 );
