@@ -40,7 +40,8 @@ class LibraryDAO @Inject()(
 
     def authorId = column[Int]("author_id")
 
-    override def * = (bookId, authorId) <> (BooksByAuthorsRelations.tupled, BooksByAuthorsRelations.unapply)
+    override def * =
+      (bookId, authorId) <> (BooksByAuthorsRelations.tupled, BooksByAuthorsRelations.unapply)
 
     def booksFK = foreignKey("books_fk", bookId, books)(
       _.bookId,
@@ -61,29 +62,17 @@ class LibraryDAO @Inject()(
 
   def getAllBookYearAuthors: Future[Seq[BookYearAuthors]] = {
     db.run(
-      (for {
-        ba <- booksByAuthors
-        b <- books if (b.bookId === ba.bookId)
-        a <- authors if (a.authorId === ba.authorId)
-      } yield (b, a)).result
-        .map {
-          _.groupBy(_._1)
-            .map {
-              case (id, book) => BookYearAuthors(id.title, id.year, book.map(_._2.authorName))
-            }.toSeq
-        }
-    )
-  }
-
-  def getAuthorsNamesByBookId(bookId: Int): Future[Seq[String]] = {
-    db.run(
-      (for {
-        (x, a) <- booksByAuthors join authors on (_.authorId === _.authorId)
-      } yield (a, x.bookId)
-        ).filter(_._2 === bookId)
-        //.sortBy(_._1.authorName)
-        .map(_._1.authorName)
-        .result
+      (
+        for {
+          ba <- booksByAuthors
+          b <- books if (b.bookId === ba.bookId)
+          a <- authors if (a.authorId === ba.authorId)
+        } yield (b, a)
+        ).result.map {
+        _.groupBy(_._1).map {
+          case (id, book) => BookYearAuthors(id.title, id.year, book.map(_._2.authorName))
+        }.toSeq
+      }
     )
   }
 
@@ -91,16 +80,8 @@ class LibraryDAO @Inject()(
     db.run(books.result)
   }
 
-  def getBookById(bookId: Int): Future[Option[Book]] = {
-    db.run(books.filter(_.bookId === bookId).result.headOption)
-  }
-
   def getAuthorsList: Future[Seq[Author]] = {
     db.run(authors.result)
-  }
-
-  def getAuthorById(authorId: Int): Future[Option[Author]] = {
-    db.run(authors.filter(_.authorId === authorId).result.headOption)
   }
 
   def addAuthorIfNotExist(authorName: String): Future[Int] = {
@@ -112,10 +93,10 @@ class LibraryDAO @Inject()(
     )
   }
 
-  def addBook(bookJson: BookYearAuthors): Future[Int] = {
-    db.run(books returning books.map(_.bookId) += Book(0, bookJson.title, bookJson.year)).map {
+  def addBook(book: BookYearAuthors): Future[Int] = {
+    db.run(books returning books.map(_.bookId) += Book(0, book.title, book.year)).map {
       bookId =>
-        bookJson.authors.foreach(
+        book.authors.foreach(
           addAuthorIfNotExist(_).map {
             authorId => db.run(booksByAuthors += BooksByAuthorsRelations(bookId, authorId))
           }
@@ -124,9 +105,18 @@ class LibraryDAO @Inject()(
     }
   }
 
-  /*  def updateBook(bookId: Int): Future[String] = {
-          db.run(books.filter(_.bookId === bookId))
-    }*/
+  def updateBook(bookId: Int, book: BookYearAuthors): Future[String] = {
+    db.run(books.filter(_.bookId === bookId).map(b => (b.title, b.year)).update(book.title, book.year)).map {
+      updatedBookRows =>
+        db.run(booksByAuthors.filter(_.bookId === bookId).delete)
+        book.authors.foreach(
+          addAuthorIfNotExist(_).map {
+            authorId => db.run(booksByAuthors += BooksByAuthorsRelations(bookId, authorId))
+          }
+        )
+        updatedBookRows.toString
+    }
+  }
 
   def deleteBook(bookId: Int): Future[Int] = {
     db.run(books.filter(_.bookId === bookId).delete)

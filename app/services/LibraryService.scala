@@ -20,11 +20,13 @@ class LibraryService @Inject()(libraryDao: LibraryDAO) {
     libraryDao.getAuthorsList
   }
 
-  def addBook(bookJson: BookYearAuthors): Future[Int] = {
-    libraryDao.addBook(bookJson)
+  def addBook(book: BookYearAuthors): Future[Int] = {
+    libraryDao.addBook(book)
   }
 
-
+  def updateBook(bookId: Int, book: BookYearAuthors): Future[String] = {
+    libraryDao.updateBook(bookId, book)
+  }
 
   def deleteBook(bookId: Int): Future[Int] = {
     libraryDao.deleteBook(bookId)

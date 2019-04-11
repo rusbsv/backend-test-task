@@ -1,24 +1,20 @@
-# web-interface for all of this manipulation with books and authors
+# index page with list of books in DB
 GET     /                           controllers.HomeController.index
 
-# Map static resources from the /public folder to the /assets URL path
-GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)
-
 # get books in format: {title, year, authors[]}
-GET       /library/                   controllers.HomeController.getAllBookYearAuthors
-# GET     /library/:bookId              controllers.HomeController.getBookYearAuthorsById(bookId: Int)
+GET       /library/                     controllers.HomeController.getAllBookYearAuthors
 
-# get books titles in format: {book_id, title}
+# get books in format: {book_id, title}
 GET     /library/titles               controllers.HomeController.getBooksList
 
 # get authors in format: {author_id, author_name}
 GET     /library/authors              controllers.HomeController.getAuthorsList
 
 # add new book
-POST    /library                      controllers.HomeController.addBook
+POST    /library/                     controllers.HomeController.addBook
 
 # update book by bookId
-# PUT     /library/:bookId              controllers.HomeController.updateBook(bookId: Int)
+PUT     /library/:bookId              controllers.HomeController.updateBook(bookId: Int)
 
 # delete book by bookId
 DELETE  /library/:bookId              controllers.HomeController.deleteBook(bookId: Int)
