@@ -8,9 +8,9 @@ import scala.concurrent.Future
 
 class LibraryService @Inject()(libraryDao: LibraryDAO) {
 
-/*  def getAllBooksYearAuthors: Future[Seq[BookYearAuthors]] = {
+  def getAllBooksYearAuthors: Future[Seq[BookYearAuthors]] = {
     libraryDao.getAllBookYearAuthors
-  }*/
+  }
 
   def getBooksList: Future[Seq[Book]] = {
     libraryDao.getBooksList

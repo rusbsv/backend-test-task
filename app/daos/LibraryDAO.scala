@@ -59,15 +59,33 @@ class LibraryDAO @Inject()(
   val authors = TableQuery[AuthorsTableDef]
   val booksByAuthors = TableQuery[BooksByAuthorsTableDef]
 
-/*  def getAllBookYearAuthors: Future[Seq[BookYearAuthors]] = {
+  def getAllBookYearAuthors: Future[Seq[BookYearAuthors]] = {
     db.run(
-      books.map {
-
-      }
+      (for {
+        ba <- booksByAuthors
+        b <- books if (b.bookId === ba.bookId)
+        a <- authors if (a.authorId === ba.authorId)
+      } yield (b, a)).result
+        .map {
+          _.groupBy(_._1)
+            .map {
+              case (id, book) => BookYearAuthors(id.title, id.year, book.map(_._2.authorName))
+            }.toSeq
+        }
     )
-  }*/
+  }
 
-  //def getBookYearAuthorsById: Future[Seq[BookYearAuthors]] = {  }
+  def getAuthorsNamesByBookId(bookId: Int): Future[Seq[String]] = {
+    db.run(
+      (for {
+        (x, a) <- booksByAuthors join authors on (_.authorId === _.authorId)
+      } yield (a, x.bookId)
+        ).filter(_._2 === bookId)
+        //.sortBy(_._1.authorName)
+        .map(_._1.authorName)
+        .result
+    )
+  }
 
   def getBooksList: Future[Seq[Book]] = {
     db.run(books.result)

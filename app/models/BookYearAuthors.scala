@@ -2,7 +2,7 @@ package models
 
 import play.api.libs.json.{Json, Reads, __}
 
-case class BookYearAuthors(title: String, year: Int, authors: List[String])
+case class BookYearAuthors(title: String, year: Int, authors: Seq[String])
 
 trait BookYearAuthorsJson {
   implicit val reads = Json.reads[BookYearAuthors]

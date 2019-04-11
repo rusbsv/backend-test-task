@@ -13,11 +13,20 @@ class HomeController @Inject()(
   libraryService: LibraryService
 )(implicit ec: ExecutionContext) extends InjectedController {
 
-  def index() = Action { implicit request: Request[AnyContent] =>
+  def index = Action { implicit request: Request[AnyContent] =>
     Ok(templates.html.index())
   }
 
-  def getBooksList() = Action.async {
+  def getAllBookYearAuthors = Action.async {
+    libraryService.getAllBooksYearAuthors.map {
+      seqOfClassBookYearAuthors =>
+        Ok(Json.toJson(seqOfClassBookYearAuthors))
+    }.recover { case _ =>
+      BadRequest(Json.toJson("status" -> "error", "message" -> "DB Error"))
+    }
+  }
+
+  def getBooksList = Action.async {
     libraryService.getBooksList.map {
       seqOfClassBook =>
         Ok(Json.toJson(seqOfClassBook))
@@ -26,7 +35,7 @@ class HomeController @Inject()(
     }
   }
 
-  def getAuthorsList() = Action.async {
+  def getAuthorsList = Action.async {
     libraryService.getAuthorsList.map {
       seqOfClassAuthor =>
         Ok(Json.toJson(seqOfClassAuthor))

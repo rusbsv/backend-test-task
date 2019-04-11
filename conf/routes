@@ -5,8 +5,8 @@ GET     /                           controllers.HomeController.index
 GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)
 
 # get books in format: {title, year, authors[]}
-# GET     /library                      controller.HomeController.getAllBookYearAuthors
-# GET     /library/:bookId              controller.HomeController.getBookYearAuthorsById(bookId: Int)
+GET       /library/                   controllers.HomeController.getAllBookYearAuthors
+# GET     /library/:bookId              controllers.HomeController.getBookYearAuthorsById(bookId: Int)
 
 # get books titles in format: {book_id, title}
 GET     /library/titles               controllers.HomeController.getBooksList
